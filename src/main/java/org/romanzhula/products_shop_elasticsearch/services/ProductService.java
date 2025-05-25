@@ -11,6 +11,9 @@ import org.romanzhula.products_shop_elasticsearch.repositories.jpa_repo.ProductR
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RequiredArgsConstructor
 @Service
@@ -27,10 +30,22 @@ public class ProductService {
         Product savedProduct = productRepositoryJpa.save(entity);
 
         // for elasticsearch
-        ProductDocument document = productMapper.toDocumentFromEntity(savedProduct);
-        productRepositoryElastic.save(document);
+        try {
+            ProductDocument document = productMapper.toDocumentFromEntity(savedProduct);
+            productRepositoryElastic.save(document);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to index in Elasticsearch", e);
+        }
 
         return productMapper.toResponseFromEntity(savedProduct);
+    }
+
+    //  Spring Data Elasticsearch example
+    public List<ProductResponse> findByName(String name) {
+        return productRepositoryElastic.findByName(name).stream()
+                .map(productMapper::toResponseFromDocument)
+                .collect(Collectors.toList()
+        );
     }
 
 }
