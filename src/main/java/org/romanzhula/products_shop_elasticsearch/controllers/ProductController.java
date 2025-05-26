@@ -7,6 +7,7 @@ import org.romanzhula.products_shop_elasticsearch.services.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -38,6 +39,14 @@ public class ProductController {
             @RequestParam String name
     ) {
         return ResponseEntity.ok(productService.searchByRest(name));
+    }
+
+    // Java Client example
+    @GetMapping("/search/java")
+    public ResponseEntity<List<ProductResponse>> searchJava(
+            @RequestParam String name
+    ) throws IOException {
+        return ResponseEntity.ok(productService.searchByJavaClient(name));
     }
 
 }
