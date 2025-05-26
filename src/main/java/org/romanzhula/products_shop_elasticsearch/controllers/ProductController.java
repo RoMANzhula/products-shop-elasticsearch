@@ -32,4 +32,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.findByName(name));
     }
 
+    // REST API example
+    @GetMapping("/search/rest")
+    public ResponseEntity<String> searchRest(
+            @RequestParam String name
+    ) {
+        return ResponseEntity.ok(productService.searchByRest(name));
+    }
+
 }
