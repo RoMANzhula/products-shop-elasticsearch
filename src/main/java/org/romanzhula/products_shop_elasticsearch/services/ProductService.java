@@ -1,5 +1,7 @@
 package org.romanzhula.products_shop_elasticsearch.services;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import lombok.RequiredArgsConstructor;
 import org.romanzhula.products_shop_elasticsearch.components.ElasticRestClient;
 import org.romanzhula.products_shop_elasticsearch.dto.request.ProductRequest;
@@ -9,10 +11,13 @@ import org.romanzhula.products_shop_elasticsearch.elasticsearch_mappers.ProductM
 import org.romanzhula.products_shop_elasticsearch.models.Product;
 import org.romanzhula.products_shop_elasticsearch.repositories.elasticsearch_repo.ProductSearchRepository;
 import org.romanzhula.products_shop_elasticsearch.repositories.jpa_repo.ProductRepository;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -24,6 +29,7 @@ public class ProductService {
     private final ProductRepository productRepositoryJpa;
     private final ProductSearchRepository productRepositoryElastic;
     private final ElasticRestClient elasticRestClient;
+    private final ElasticsearchClient elasticsearchClient;
 
 
     @Transactional
@@ -65,6 +71,27 @@ public class ProductService {
         ;
 
         return elasticRestClient.searchByRest(queryJson);
+    }
+
+    // Java Client example
+    public List<ProductResponse> searchByJavaClient(String name) throws IOException {
+        SearchResponse<ProductDocument> response = elasticsearchClient.search(s -> s
+                        .index("products")
+                        .query(q -> q
+                                .match(m -> m
+                                        .field("name")
+                                        .query(name)
+                                )
+                        ),
+                ProductDocument.class
+        );
+
+        return response.hits().hits().stream()
+                .map(Hit::source)
+                .filter(Objects::nonNull)
+                .map(productMapper::toResponseFromDocument)
+                .collect(Collectors.toList())
+        ;
     }
 
 }
