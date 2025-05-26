@@ -1,6 +1,7 @@
 package org.romanzhula.products_shop_elasticsearch.services;
 
 import lombok.RequiredArgsConstructor;
+import org.romanzhula.products_shop_elasticsearch.components.ElasticRestClient;
 import org.romanzhula.products_shop_elasticsearch.dto.request.ProductRequest;
 import org.romanzhula.products_shop_elasticsearch.dto.respons.ProductResponse;
 import org.romanzhula.products_shop_elasticsearch.elasticsearch_documents.ProductDocument;
@@ -22,6 +23,8 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final ProductRepository productRepositoryJpa;
     private final ProductSearchRepository productRepositoryElastic;
+    private final ElasticRestClient elasticRestClient;
+
 
     @Transactional
     public ProductResponse save(ProductRequest productRequest) {
@@ -45,7 +48,23 @@ public class ProductService {
         return productRepositoryElastic.findByName(name).stream()
                 .map(productMapper::toResponseFromDocument)
                 .collect(Collectors.toList()
-        );
+                );
+    }
+
+    // Rest API example
+    public String searchByRest(String keyword) {
+        String queryJson = """
+                {
+                  "query": {
+                    "match": {
+                      "name": "%s"
+                    }
+                  }
+                }
+                """.formatted(keyword)
+        ;
+
+        return elasticRestClient.searchByRest(queryJson);
     }
 
 }
