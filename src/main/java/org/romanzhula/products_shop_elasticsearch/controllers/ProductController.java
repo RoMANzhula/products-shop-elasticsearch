@@ -49,4 +49,10 @@ public class ProductController {
         return ResponseEntity.ok(productService.searchByJavaClient(name));
     }
 
+    @PostMapping("/reindex")
+    public ResponseEntity<String> reindexAllProducts() {
+        productService.reindexAllProducts();
+        return ResponseEntity.ok("Reindexing started successfully");
+    }
+
 }
