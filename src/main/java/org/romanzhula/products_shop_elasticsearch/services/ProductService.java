@@ -111,11 +111,18 @@ public class ProductService {
         ;
     }
 
-    public List<ProductResponse> getAllIndexedProducts() {
-        Iterable<ProductDocument> documents = productRepositoryElastic.findAll();
-        return StreamSupport.stream(documents.spliterator(), false)
-                .map(productMapper::toResponseFromDocument)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public void reindexAllProducts() {
+        Iterable<Product> allProducts = productRepositoryJpa.findAll();
+
+        List<ProductDocument> documents = StreamSupport.stream(allProducts.spliterator(), false)
+                .map(productMapper::toDocumentFromEntity)
+                .collect(Collectors.toList())
+        ;
+
+        productRepositoryElastic.saveAll(documents);
+
+        log.info("Reindexed {} products to Elasticsearch", documents.size());
     }
 
 }
