@@ -1,0 +1,86 @@
+Common commands for WSL:
+    mvn clean package -DskipTests                       - build our project ignoring maven testings
+    docker system prune -a --volumes                    - clear all files(images, containers...) in Docker
+    docker-compose build --no-cache                     - build our docker-compose file ignoring cache
+    docker-compose up                                   - start our container in Docker
+    docker-compose up -d                                - start our container in phone (we don't see logs in terminal)
+    docker-compose down                                 - stop our container(for rebuild)
+    docker-compose down --volumes --remove-orphans      - deep rebuild
+    docker ps                                           - show running containers
+
+    GLOBAL REBUILD:
+        ./mvnw clean package -DskipTests
+        docker-compose down --volumes --remove-orphans
+        docker-compose up --build
+
+
+
+
+REST API Postman:
+
+        For synchronized PostgresQL and Elasticsearch:
+    POST    http://localhost:8080/api/v1/products/reindex
+    return body Raw:    Reindexing started successfully
+
+
+        For add new product
+    POST    http://localhost:8080/api/v1/products/add
+    Body -> raw:
+        {
+          "name": "Samsung Galaxy S24",
+          "description": "Samsung flagship smartphone, 256GB, Phantom Black",
+          "price": 949.5
+        }
+
+
+        For Spring Data Elasticsearch example
+    GET     http://localhost:8080/api/v1/products/name/samsung
+    return body JSON:
+        [
+            {
+                "id": 2,
+                "name": "Samsung Galaxy S23",
+                "description": "Samsung flagship smartphone, 256GB, Phantom Black",
+                "price": 899.5
+            },
+            {
+                "id": 10,
+                "name": "Samsung 32\" Monitor",
+                "description": "32-inch QHD monitor with 75Hz refresh rate",
+                "price": 279.0
+            }
+        ]
+
+
+        For REST API example
+    GET     http://localhost:8080/api/v1/products/search/rest?name=samsung
+    return body Raw:
+        {"took":5,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":{"value":2,"relation":"eq"},"max_score":1.6296111,"hits":[{"_index":"products","_id":"2","_score":1.6296111,"_source":{"_class":"org.romanzhula.products_shop_elasticsearch.elasticsearch_documents.ProductDocument","id":"2","name":"Samsung Galaxy S23","description":"Samsung flagship smartphone, 256GB, Phantom Black","price":899.5}},{"_index":"products","_id":"10","_score":1.6296111,"_source":{"_class":"org.romanzhula.products_shop_elasticsearch.elasticsearch_documents.ProductDocument","id":"10","name":"Samsung 32\" Monitor","description":"32-inch QHD monitor with 75Hz refresh rate","price":279.0}}]}}
+
+
+        For Java Client example
+    GET     http://localhost:8080/api/v1/products/search/java?name=samsung
+    return body JSON:
+        [
+            {
+                "id": 2,
+                "name": "Samsung Galaxy S23",
+                "description": "Samsung flagship smartphone, 256GB, Phantom Black",
+                "price": 899.5
+            },
+            {
+                "id": 10,
+                "name": "Samsung 32\" Monitor",
+                "description": "32-inch QHD monitor with 75Hz refresh rate",
+                "price": 279.0
+            }
+        ]
+
+
+
+USEFUL URL
+    localhost:5601                                      - kibana homepage
+    localhost:9200                                      - elasticsearch homepage
+    localhost:9200/_cat/indices?v                       - elasticsearch indices
+    localhost:9200/products/_search?pretty              - all our products (10 elements on a page)
+    localhost:9200/products/_search?pretty&size=20      - for more elements on a page
