@@ -84,3 +84,5 @@ USEFUL URL
     localhost:9200/_cat/indices?v                       - elasticsearch indices
     localhost:9200/products/_search?pretty              - all our products (10 elements on a page)
     localhost:9200/products/_search?pretty&size=20      - for more elements on a page
+
+    https://docs.spring.io/spring-data/elasticsearch/reference/elasticsearch/versions.html
